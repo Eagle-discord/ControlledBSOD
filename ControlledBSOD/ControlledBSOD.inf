@@ -1,0 +1,62 @@
+;
+; ControlledBSOD.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = ControlledBSOD.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+ControlledBSOD.sys  = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%ControlledBSOD.DeviceDesc% = ControlledBSOD_Device, Root\ControlledBSOD ; TODO: edit hw-id
+
+[ControlledBSOD_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+ControlledBSOD.sys
+
+;-------------- Service installation
+[ControlledBSOD_Device.NT.Services]
+AddService = ControlledBSOD,%SPSVCINST_ASSOCSERVICE%, ControlledBSOD_Service_Inst
+
+; -------------- ControlledBSOD driver install sections
+[ControlledBSOD_Service_Inst]
+DisplayName    = %ControlledBSOD.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\ControlledBSOD.sys
+
+[ControlledBSOD_Device.NT.Wdf]
+KmdfService = ControlledBSOD, ControlledBSOD_wdfsect
+
+[ControlledBSOD_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "ControlledBSOD Installation Disk"
+ControlledBSOD.DeviceDesc = "ControlledBSOD Device"
+ControlledBSOD.SVCDESC = "ControlledBSOD Service"
